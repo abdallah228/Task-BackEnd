@@ -3,6 +3,7 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\functions;
+use App\Http\Requests\ProductsRequestValidated;
 use App\Repositories\ProductRepositoryInterface;
 use Illuminate\Http\Request;
 use Illuminate\Http\JsonResponse;
@@ -60,18 +61,10 @@ class ProductsController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function store(Request $request): JsonResponse
+    public function store(ProductsRequestValidated $request): JsonResponse
     {
         try {
-            $data = $request->validate([
-                'name' => 'required|string',
-                'description' => 'required|string',
-                'image' => 'required|image',
-                'price' => 'required|numeric',
-                'slug' => 'required|string|unique:products',
-                'is_active' => 'sometimes|boolean',
-            ]);
-
+            $data = $request->validated();
             // Call the uploadImage function from the helper
             // Define data type: $data['image'] is a string (file path or URL)
             $data['image'] = Functions::uploadImage($request->file('image'));
@@ -91,7 +84,7 @@ class ProductsController extends Controller
      * @param  int  $id
      * @return \Illuminate\Http\JsonResponse
      */
-    public function update(Request $request, $id): JsonResponse
+    public function update(ProductsRequestValidated $request, $id): JsonResponse
     {
         try {
             $product = $this->productRepository->find($id);
@@ -100,14 +93,7 @@ class ProductsController extends Controller
                 return response()->json(['error' => 'Product not found'], 404);
             }
 
-            $data = $request->validate([
-                'name' => 'sometimes|string',
-                'description' => 'sometimes|string',
-                'image' => 'sometimes|image',
-                'price' => 'sometimes|numeric',
-                'slug' => 'sometimes|string|unique:products,slug,' . $id,
-                'is_active' => 'sometimes|boolean',
-            ]);
+            $data = $request->validated();
 
             if ($request->hasFile('image')) {
                 // Call the uploadImage function from the helper

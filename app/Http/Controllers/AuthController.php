@@ -3,6 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Helpers\functions;
+use App\Http\Requests\UserLoginRequest;
+use App\Http\Requests\UserRegisterRequest;
 use Illuminate\Http\Request;
 use App\Models\User;
 use Illuminate\Http\JsonResponse;
@@ -13,16 +15,10 @@ class AuthController extends Controller
 {
     //
 
-    public function register(Request $request)
+    public function register(UserRegisterRequest $request)
     {
         /** @var array $validatedData */
-        $validatedData  = $request->validate([
-            'name' => 'required|string',
-            'user_name' => 'required|string|unique:users',
-            'password' => 'required|string|min:6',
-            'avatar'=> 'required|image',
-            'type'=>'sometimes',
-        ]);
+        $validatedData = $request->validated();
         $validatedData ['avatar'] = functions::uploadImage($request->avatar);
 
         /** @var \App\Models\User $user */
@@ -36,13 +32,11 @@ class AuthController extends Controller
      * @param  \Illuminate\Http\Request  $request
      * @return \Illuminate\Http\JsonResponse
      */
-    public function login(Request $request): JsonResponse
+    public function login(UserLoginRequest $request): JsonResponse
     {
         /** @var array $credentials */
-        $credentials = $request->validate([
-            'user_name' => 'required|string',
-            'password' => 'required|string',
-        ]);
+        $credentials = $request->validated();
+
 
         /** @var string|null $token */
         $token = Auth::attempt($credentials);

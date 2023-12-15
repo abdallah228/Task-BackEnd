@@ -10,4 +10,18 @@ class Product extends Model
     use HasFactory;
 
     protected $guared = [];
+
+     /**
+     * The attributes that are mass assignable.
+     *
+     * @var array<int, string>
+     */
+    protected $fillable = [
+        'name',
+        'description',
+        'image',
+        'price',
+        'slug',
+        'is_active',
+    ];
 }
